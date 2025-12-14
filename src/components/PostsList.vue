@@ -11,16 +11,17 @@
         <option :value="totalPosts">Все</option>
       </select>
 
-      <div class="postItem" v-for="post in posts" :key="post.id">
-        <h3>{{ post.id }}: {{ post.title }}</h3>
-        <p>{{ post.body }}</p>
-      </div>
+      <ul class="postsList">
+        <li class="postItem" v-for="post in posts" :key="post.id">
+          <h3>{{ post.id }}: {{ post.title }}</h3>
+          <p>{{ post.body }}</p>
+        </li>
+      </ul>
 
       <div v-if="loading">Загрузка...</div>
       <div v-if="error">Ошибка: {{ error }}</div>
     </div>
 
-    <!-- Пагинация -->
     <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px">
       <p
         v-for="page in totalPages"
@@ -100,12 +101,19 @@ watch([limit, curPage], fetchPosts)
   padding: 20px;
 }
 
+.postsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
 .postItem {
   border: 3px green solid;
   border-radius: 5px;
   box-sizing: border-box;
   padding: 10px;
-  margin: 10px;
+  margin: 10px 0;
 }
 
 .buttonGo {

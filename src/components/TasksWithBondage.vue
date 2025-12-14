@@ -28,8 +28,8 @@
       <button class="button_task" :disabled="!canCreateTask">Создать задачу</button>
     </form>
 
-    <div class="task_list">
-      <div class="task_item" v-for="task in filteredTasks" :key="task.id">
+    <ul class="task_list">
+      <li class="task_item" v-for="task in filteredTasks" :key="task.id">
         <h4>Название задачи: {{ task.name }}</h4>
         <p>Описание задачи: {{ task.descr }}</p>
         <div class="footer_item">
@@ -40,8 +40,8 @@
           </div>
           <button class="button_task" @click="deleteTask(task.id)">Удалить</button>
         </div>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -140,8 +140,10 @@ const filteredTasks = computed(() => {
   border: 1px red solid;
   border-radius: 10px;
   box-sizing: border-box;
-  padding: 5px;
   align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 .task_item {
   display: flex;
