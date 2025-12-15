@@ -2,6 +2,7 @@
   <nav class="navbar">
     <router-link to="/">Posts</router-link>
     <router-link to="/tasks">Tasks</router-link>
+    <router-link to="/count">Count</router-link>
     <router-link to="/training">Training</router-link>
   </nav>
 </template>
