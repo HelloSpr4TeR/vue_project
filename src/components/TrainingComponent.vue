@@ -6,7 +6,9 @@
       <input v-model="userName" placeholder="Введите логин" />
       <button :disabled="!dis">Создать пользователя</button>
     </form>
-    <ul v-if="searchUsers.length">
+    <div v-if="isLoad">Загрузка...</div>
+    <div v-else-if="error">Ошибка: {{ error }}</div>
+    <ul v-if="searchUsers.length > 0">
       <li v-for="user in searchUsers" :key="user.id">
         <h3>Номер id: {{ user.id }}</h3>
         <p>Имя: {{ user.name }}</p>
@@ -14,13 +16,12 @@
         <button @click="deleteUser(user.id)">Удалить пользователя</button>
       </li>
     </ul>
-    <div v-if="error">Ошибка</div>
-    <div v-if="isLoad">Загрузка</div>
+    <p v-else>Пользователи не найдены</p>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 const users = ref([])
 const error = ref(null)
 const isLoad = ref(false)
@@ -31,33 +32,50 @@ const searchUser = ref('')
 let controller
 
 onMounted(() => {
-  controller = new AbortController()
+  const saved = localStorage.getItem('users')
+  if (saved) {
+    users.value = JSON.parse(saved)
+  } else {
+    controller = new AbortController()
 
-  const fetchUsers = async () => {
-    isLoad.value = true
-    try {
-      const res = await fetch(`https://jsonplaceholder.typicode.com/users`, {
-        signal: controller.signal,
-      })
-      if (!res.ok) {
-        throw new Error('Ошибка запроса')
+    const fetchUsers = async () => {
+      isLoad.value = true
+      try {
+        const res = await fetch(`https://jsonplaceholder.typicode.com/users`, {
+          signal: controller.signal,
+        })
+        if (!res.ok) {
+          throw new Error('Ошибка запроса')
+        }
+        const data = await res.json()
+        users.value.unshift(...data)
+      } catch (e) {
+        if (e.name === 'AbortError') {
+          error.value = e.name
+          console.log('Запрос отменен')
+        } else {
+          error.value = e.message
+        }
+      } finally {
+        isLoad.value = false
       }
-      const data = await res.json()
-      users.value.unshift(...data)
-    } catch (e) {
-      if (e.name === 'AbortError') {
-        error.value = e.name
-        console.log('Запрос отменен')
-      } else {
-        error.value = e
-      }
-    } finally {
-      isLoad.value = false
     }
-  }
 
-  fetchUsers()
+    fetchUsers()
+  }
 })
+
+watch(
+  users,
+  (newUsers) => {
+    if (newUsers.length === 0) {
+      localStorage.removeItem('users')
+    } else {
+      localStorage.setItem('users', JSON.stringify(newUsers))
+    }
+  },
+  { deep: true },
+)
 
 onUnmounted(() => {
   if (controller) controller.abort()
