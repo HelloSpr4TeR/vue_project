@@ -6,7 +6,7 @@
       </div>
 
       <div>
-        Показать с бондажом
+        Показать с бандажом
         <input type="checkbox" v-model="filtBond" />
       </div>
 
@@ -22,7 +22,7 @@
       <input v-model="taskName" placeholder="Название задачи" />
       <textarea v-model="taskDescr" placeholder="Описание задачи" style="margin: 5px"></textarea>
       <div>
-        Указать наличие бондажа:
+        Указать наличие бандажа:
         <input type="checkbox" v-model="isBondage" />
       </div>
       <button class="button_task" :disabled="!canCreateTask">Создать задачу</button>
@@ -33,7 +33,7 @@
         <h4>Название задачи: {{ task.name }}</h4>
         <p>Описание задачи: {{ task.descr }}</p>
         <div class="footer_item">
-          <p>Наличие бондажа: {{ task.bondage ? 'Есть' : 'Нет' }}</p>
+          <p>Наличие бандажа: {{ task.bondage ? 'Есть' : 'Нет' }}</p>
           <div>
             Выполнено:
             <input type="checkbox" v-model="task.checked" />

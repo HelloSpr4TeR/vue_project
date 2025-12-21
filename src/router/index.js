@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PostsList from '@/components/PostsList.vue'
+import UsersList from '@/components/UsersList.vue'
 import TasksWithBondage from '@/components/TasksWithBondage.vue'
 import TrainingComponent from '@/components/TrainingComponent.vue'
 import CountTimer from '@/components/CountTimer.vue'
@@ -24,6 +25,11 @@ const routes = [
     path: '/count',
     name: 'count',
     component: CountTimer,
+  },
+  {
+    path: '/users',
+    name: 'users',
+    component: UsersList,
   },
 ]
 

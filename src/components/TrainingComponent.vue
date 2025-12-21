@@ -1,104 +1,165 @@
 <template>
-  <div>
-    <input v-model="searchUser" placeholder="Найти пользователя" />
-    <form @submit.prevent="createUser">
-      <input v-model="name" placeholder="Введите имя" />
-      <input v-model="userName" placeholder="Введите логин" />
-      <button :disabled="!dis">Создать пользователя</button>
-    </form>
-    <div v-if="isLoad">Загрузка...</div>
+  <div class="container">
+    <input v-model="name" placeholder="Введите имя персонажа" />
+    <div v-if="isLoad">Загрузка</div>
     <div v-else-if="error">Ошибка: {{ error }}</div>
-    <ul v-if="searchUsers.length > 0">
-      <li v-for="user in searchUsers" :key="user.id">
-        <h3>Номер id: {{ user.id }}</h3>
-        <p>Имя: {{ user.name }}</p>
-        <p>Логин: {{ user.username }}</p>
-        <button @click="deleteUser(user.id)">Удалить пользователя</button>
+    <ul v-else-if="characters.length > 0">
+      <li v-for="character in characters" :key="character.id">
+        <p>Имя: {{ character.name }}</p>
       </li>
+      <p>Страниц: {{ pages }}</p>
+      <button style="cursor: pointer" :disabled="page === 1" @click="clickPage('prev')">
+        Предыдущая страница
+      </button>
+      <button style="cursor: pointer" :disabled="page === pages" @click="clickPage">
+        Следующая страница
+      </button>
     </ul>
-    <p v-else>Пользователи не найдены</p>
+    <div class="pagin">
+      <p
+        class="page"
+        :class="{ active: pag === page }"
+        @click="page = pag"
+        v-for="pag in pagin()"
+        :key="pag"
+      >
+        {{ pag }}
+      </p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-const users = ref([])
+import { onUnmounted, ref, watch } from 'vue'
+
+const characters = ref([])
 const error = ref(null)
 const isLoad = ref(false)
 const name = ref('')
-const userName = ref('')
-const searchUser = ref('')
+const page = ref(1)
+const pages = ref(0)
 
 let controller
+let id = null
 
-onMounted(() => {
-  const saved = localStorage.getItem('users')
-  if (saved) {
-    users.value = JSON.parse(saved)
-  } else {
-    controller = new AbortController()
-
-    const fetchUsers = async () => {
-      isLoad.value = true
-      try {
-        const res = await fetch(`https://jsonplaceholder.typicode.com/users`, {
-          signal: controller.signal,
-        })
-        if (!res.ok) {
-          throw new Error('Ошибка запроса')
-        }
-        const data = await res.json()
-        users.value.unshift(...data)
-      } catch (e) {
-        if (e.name === 'AbortError') {
-          error.value = e.name
-          console.log('Запрос отменен')
-        } else {
-          error.value = e.message
-        }
-      } finally {
-        isLoad.value = false
+const fetchCharacters = async (name, page, signal) => {
+  error.value = null
+  isLoad.value = true
+  try {
+    const res = await fetch(
+      `http://rickandmortyapi.com/api/character?name=${name}&page=${page}`,
+      signal,
+    )
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error('Персонаж не найден')
       }
+      throw new Error('Ошибка')
     }
-
-    fetchUsers()
+    const data = await res.json()
+    characters.value = []
+    characters.value.push(...data.results)
+    pages.value = data.info.pages
+  } catch (e) {
+    if (e.message === 'AbortError') {
+      console.log('Запрос был отменен')
+    }
+    error.value = e.message
+  } finally {
+    isLoad.value = false
   }
-})
+}
 
 watch(
-  users,
-  (newUsers) => {
-    if (newUsers.length === 0) {
-      localStorage.removeItem('users')
-    } else {
-      localStorage.setItem('users', JSON.stringify(newUsers))
-    }
+  [name, page],
+  () => {
+    clearTimeout(id)
+    id = null
+    id = setTimeout(() => {
+      if (controller) controller.abort()
+
+      controller = new AbortController()
+      fetchCharacters(name.value, page.value, { signal: controller.signal })
+    }, 500)
   },
-  { deep: true },
+  { immediate: true },
 )
 
 onUnmounted(() => {
+  clearTimeout(id)
+  id = null
   if (controller) controller.abort()
 })
 
-const createUser = () => {
-  users.value.unshift({ id: Date.now(), name: name.value, username: userName.value })
-  name.value = ''
-  userName.value = ''
-}
-
-const deleteUser = (id) => {
-  users.value = users.value.filter((user) => user.id !== id)
-}
-
-const dis = computed(() => name.value && userName.value)
-
-const searchUsers = computed(() => {
-  if (!searchUser.value) return users.value
-  return users.value.filter((user) =>
-    user.name.toLowerCase().includes(searchUser.value.toLowerCase()),
-  )
+watch(name, () => {
+  page.value = 1
 })
+
+const clickPage = (p) => {
+  if (p === 'prev') page.value--
+  else page.value++
+}
+
+const pagin = () => {
+  const total = pages.value
+  const current = page.value
+  const res = []
+
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) res.push(i)
+    return res
+  }
+
+  res.push(1)
+
+  if (current > 4) res.push('...')
+
+  let start = Math.max(2, current - 1)
+  let end = Math.min(total - 1, current + 1)
+
+  if (current <= 4) {
+    start = 2
+    end = 5
+  } else if (current >= total - 3) {
+    start = total - 4
+    end = total - 1
+  }
+
+  for (let i = start; i <= end; i++) res.push(i)
+
+  if (current < total - 3) res.push('...')
+
+  res.push(total)
+
+  return res
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pagin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  gap: 2px;
+}
+.page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px blue solid;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+.page.active {
+  border: 3px red solid;
+  height: 30px;
+}
+</style>
