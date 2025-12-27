@@ -4,6 +4,9 @@
     <router-link to="/tasks">Tasks</router-link>
     <router-link to="/count">Count</router-link>
     <router-link to="/users">Users</router-link>
+    <router-link to="/characters">Characters</router-link>
+    <router-link to="/lazy">CharLazy</router-link>
+    <router-link to="/virtual">Virtualized</router-link>
     <router-link to="/training">Training</router-link>
   </nav>
 </template>

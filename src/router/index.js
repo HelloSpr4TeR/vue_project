@@ -1,9 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import PostsList from '@/components/PostsList.vue'
-import UsersList from '@/components/UsersList.vue'
-import TasksWithBondage from '@/components/TasksWithBondage.vue'
-import TrainingComponent from '@/components/TrainingComponent.vue'
-import CountTimer from '@/components/CountTimer.vue'
+import PostsList from '@/pages/PostsList.vue'
+import UsersList from '@/pages/UsersList.vue'
+import TasksWithBondage from '@/pages/TasksWithBondage.vue'
+import TrainingComponent from '@/pages/TrainingComponent.vue'
+import CountTimer from '@/pages/CountTimer.vue'
+import CharactersList from '@/pages/CharactersList.vue'
+import CharactersLazy from '@/pages/CharactersLazy.vue'
+import PostsVirtualized from '@/pages/PostsVirtualized.vue'
 
 const routes = [
   {
@@ -30,6 +33,21 @@ const routes = [
     path: '/users',
     name: 'users',
     component: UsersList,
+  },
+  {
+    path: '/characters',
+    name: 'characters',
+    component: CharactersList,
+  },
+  {
+    path: '/lazy',
+    name: 'lazy',
+    component: CharactersLazy,
+  },
+  {
+    path: '/virtual',
+    name: 'virtual',
+    component: PostsVirtualized,
   },
 ]
 
