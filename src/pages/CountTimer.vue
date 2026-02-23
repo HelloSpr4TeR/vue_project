@@ -4,7 +4,6 @@
     <h2>Таймер: {{ time }}</h2>
     <button v-if="time > 0" @click="handleClick">Кнопка</button>
     <div style="height: 1500px"></div>
-    <!-- для скролла -->
   </div>
 </template>
 

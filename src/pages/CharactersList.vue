@@ -47,7 +47,7 @@ const fetchCharacters = async (name, page, signal) => {
   isLoad.value = true
   try {
     const res = await fetch(
-      `http://rickandmortyapi.com/api/character?name=${name}&page=${page}`,
+      `https://rickandmortyapi.com/api/character?name=${name}&page=${page}`,
       signal,
     )
     if (!res.ok) {

@@ -27,7 +27,7 @@ const lastElem = ref(null)
 const fetchCharacters = async (page) => {
   try {
     load.value = true
-    const res = await fetch(`http://rickandmortyapi.com/api/character?page=${page}`)
+    const res = await fetch(`https://rickandmortyapi.com/api/character?page=${page}`)
     if (!res.ok) {
       throw new Error('Ошибка')
     }
