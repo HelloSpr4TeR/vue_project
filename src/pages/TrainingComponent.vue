@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="load">Загрузка...</div>
-    <MyTable v-else-if="data" :dataTable="data" />
+    <MyTable v-else-if="data" :dataTable="data" @func="handleClick" />
     <div v-else>Данные отсутствуют</div>
   </div>
 </template>
@@ -32,6 +32,10 @@ onMounted(() => {
 
   fetchData(url)
 })
+
+const handleClick = (prop) => {
+  console.log(`Получил из дочернего ${prop}`)
+}
 </script>
 
 <style lang="scss" scoped></style>

@@ -8,16 +8,21 @@
     <tbody v-if="dataTableArr">
       <tr v-for="item in dataTable" :key="item.id">
         <td v-for="key in dataKeys" :key="key">
-          <span v-if="typeof item[key] !== 'object'">{{ item[key] }}</span>
-          <MyTable v-else :dataTable="item[key]" />
+          <span v-if="typeof item[key] !== 'object'">
+            {{ item[key] }}
+          </span>
+          <MyTable v-else :dataTable="item[key]" @func="sendProp" />
         </td>
       </tr>
     </tbody>
     <tbody v-else>
       <tr>
         <td v-for="key in dataKeys" :key="key">
-          <span v-if="typeof dataTable[key] !== 'object'">{{ dataTable[key] }}</span>
-          <MyTable v-else :dataTable="dataTable[key]" />
+          <span v-if="typeof dataTable[key] !== 'object'"
+            ><p>{{ dataTable[key] }}</p>
+            <button @click="sendProp">Вверх</button></span
+          >
+          <MyTable v-else :dataTable="dataTable[key]" @func="sendProp" />
         </td>
       </tr>
     </tbody>
@@ -33,6 +38,12 @@ const props = defineProps({
     required: true,
   },
 })
+
+const emit = defineEmits(['func'])
+
+const sendProp = () => {
+  emit('func', 'привет')
+}
 
 const dataTableArr = computed(() => {
   if (Array.isArray(props.dataTable) && props.dataTable.length > 0) {
